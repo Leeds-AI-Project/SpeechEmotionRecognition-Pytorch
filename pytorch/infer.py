@@ -5,6 +5,8 @@ from mser.predict import MSERPredictor
 from mser.utils.utils import add_arguments, print_arguments
 
 
+# TODO: 待修改文件
+
 def run(args_dict):
     # 获取识别器
     predictor = MSERPredictor(configs=args_dict.configs, model_path=args_dict.model_path, use_gpu=args_dict.use_gpu)
