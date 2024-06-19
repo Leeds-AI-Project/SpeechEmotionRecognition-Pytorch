@@ -19,3 +19,6 @@ av>=10.0.0
 joblib>=1.2.0
 funasr>=1.0.22
 modelscope>=1.13.3
+torch~=2.0.1
+flask~=3.0.3
+setuptools~=69.5.1
