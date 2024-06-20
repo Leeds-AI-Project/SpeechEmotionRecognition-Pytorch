@@ -13,15 +13,15 @@ dataset_conf:
   # 对音频进行音量归一化的音量分贝值
   target_dB: -20
   # 归一化文件路径
-  scaler_path: 'dataset/standard.m'
+  scaler_path: 'pytorch/dataset/standard.m'
   # 训练数据的数据列表路径
 #  train_list: 'dataset/train_list.txt'
-  train_list: 'dataset/train_list_features.txt'
+  train_list: 'pytorch/dataset/train_list_features.txt'
   # 测试数据的数据列表路径
 #  test_list: 'dataset/test_list.txt'
-  test_list: 'dataset/test_list_features.txt'
+  test_list: 'pytorch/dataset/test_list_features.txt'
   # 标签列表
-  label_list_path: 'dataset/label_list.txt'
+  label_list_path: 'pytorch/dataset/label_list.txt'
   # 评估的数据要特殊处理
   eval_conf:
     # 评估的批量大小
@@ -43,7 +43,7 @@ dataset_conf:
     # 音量增强概率
     volume_aug_prob: 0.2
     # 噪声增强的噪声文件夹
-    noise_dir: 'dataset/noise'
+    noise_dir: 'pytorch/dataset/noise'
     # 噪声增强概率
     noise_aug_prob: 0.2
 
