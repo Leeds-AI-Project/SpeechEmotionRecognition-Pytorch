@@ -48,7 +48,7 @@ def upload_file():
         add_arg('configs', str, 'pytorch/configs/bi_lstm.yml', '配置文件')
         add_arg('use_gpu', bool, True, '是否使用GPU预测')
         add_arg('audio_path', str, file_path, '音频路径')
-        add_arg('model_path', str, 'pytorch/models/BiLSTM_Emotion2Vec/best_model/', '导出的预测模型文件路径')
+        add_arg('model_path', str, 'pytorch/models/BaseModel_Emotion2Vec/best_model/', '导出的预测模型文件路径')
         args = parser.parse_args()
         print_arguments(args=args)
         return infer.run(args), 200

@@ -76,5 +76,5 @@ train_conf: # 是否开启自动混合精度
   log_interval: 10
 
 # 所使用的模型
-#use_model: 'BaseModel'
-use_model: 'BiLSTM'
+use_model: 'BaseModel'
+#use_model: 'BiLSTM'
