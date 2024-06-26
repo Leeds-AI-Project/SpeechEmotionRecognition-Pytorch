@@ -30,6 +30,8 @@ from mser.utils.logger import setup_logger
 from mser.utils.scheduler import WarmupCosineSchedulerLR
 from mser.utils.utils import dict_to_object, plot_confusion_matrix, print_arguments
 
+from pytorch.mser.models.lstm_self import LSTM
+
 logger = setup_logger(__name__)
 
 
@@ -138,7 +140,7 @@ class MSERTrainer(object):
         logger.info(f'归一化文件保存在：{self.configs.dataset_conf.scaler_path}')
 
     # 提取特征保存文件
-    def extract_features(self, save_dir='dataset/features'):
+    def extract_features(self, save_dir='pytorch/dataset/features'):
         audio_featurizer = AudioFeaturizer(feature_method=self.configs.preprocess_conf.feature_method,
                                            method_args=self.configs.preprocess_conf.get('method_args', {}))
         for i, data_list in enumerate([self.configs.dataset_conf.train_list, self.configs.dataset_conf.test_list]):
@@ -171,6 +173,8 @@ class MSERTrainer(object):
             self.model = BiLSTM(input_size=input_size, **self.configs.model_conf)
         elif self.configs.use_model == 'BaseModel':
             self.model = BaseModel(input_size=input_size, **self.configs.model_conf)
+        elif self.configs.use_model == 'LSTM':
+            self.model = LSTM(input_size=input_size, **self.configs.model_conf)
         else:
             raise Exception(f'{self.configs.use_model} 模型不存在！')
         self.model.to(self.device)
@@ -470,6 +474,7 @@ class MSERTrainer(object):
         self.model.eval()
         if isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
             eval_model = self.model.module
+
         else:
             eval_model = self.model
 

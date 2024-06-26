@@ -15,10 +15,10 @@ dataset_conf:
   # 归一化文件路径
   scaler_path: 'pytorch/dataset/standard.m'
   # 训练数据的数据列表路径
-#  train_list: 'dataset/train_list.txt'
+#  train_list: 'pytorch/dataset/train_list.txt'
   train_list: 'pytorch/dataset/train_list_features.txt'
   # 测试数据的数据列表路径
-#  test_list: 'dataset/test_list.txt'
+#  test_list: 'pytorch/dataset/test_list.txt'
   test_list: 'pytorch/dataset/test_list_features.txt'
   # 标签列表
   label_list_path: 'pytorch/dataset/label_list.txt'
@@ -84,5 +84,5 @@ train_conf:
   log_interval: 10
 
 # 所使用的模型
-#use_model: 'BaseModel'
-use_model: 'BiLSTM'
+use_model: 'BaseModel'
+#use_model: 'LSTM'

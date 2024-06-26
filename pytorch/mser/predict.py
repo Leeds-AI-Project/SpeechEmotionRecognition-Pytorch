@@ -6,23 +6,21 @@ import joblib
 import numpy as np
 import torch
 import yaml
-
 from mser import SUPPORT_MODEL
 from mser.data_utils.audio import AudioSegment
 from mser.data_utils.featurizer import AudioFeaturizer
-from mser.models.bi_lstm import BiLSTM
 from mser.models.base_model import BaseModel
+from mser.models.bi_lstm import BiLSTM
 from mser.utils.logger import setup_logger
 from mser.utils.utils import dict_to_object, print_arguments
+
+from pytorch.mser.models.lstm_self import LSTM
 
 logger = setup_logger(__name__)
 
 
 class MSERPredictor:
-    def __init__(self,
-                 configs,
-                 model_path='models/BiLSTM_Emotion2Vec/best_model/',
-                 use_gpu=True):
+    def __init__(self, configs, model_path='models/BiLSTM_Emotion2Vec/best_model/', use_gpu=True):
         """
         声音分类预测工具
         :param configs: 配置参数
@@ -57,6 +55,8 @@ class MSERPredictor:
             self.predictor = BiLSTM(input_size=self._audio_featurizer.feature_dim, **self.configs.model_conf)
         elif self.configs.use_model == 'BaseModel':
             self.predictor = BaseModel(input_size=self._audio_featurizer.feature_dim, **self.configs.model_conf)
+        elif self.configs.use_model == 'LSTM':
+            self.predictor = LSTM(input_size=self._audio_featurizer.feature_dim, **self.configs.model_conf)
         else:
             raise Exception(f'{self.configs.use_model} 模型不存在！')
         self.predictor.to(self.device)
@@ -91,8 +91,7 @@ class MSERPredictor:
             audio_segment = AudioSegment.from_bytes(audio_data)
         else:
             raise Exception(f'不支持该数据类型，当前数据类型为：{type(audio_data)}')
-        assert audio_segment.duration >= self.configs.dataset_conf.min_duration, \
-            f'音频太短，最小应该为{self.configs.dataset_conf.min_duration}s，当前音频为{audio_segment.duration}s'
+        assert audio_segment.duration >= self.configs.dataset_conf.min_duration, f'音频太短，最小应该为{self.configs.dataset_conf.min_duration}s，当前音频为{audio_segment.duration}s'
         # 重采样
         if audio_segment.sample_rate != self.configs.dataset_conf.sample_rate:
             audio_segment.resample(self.configs.dataset_conf.sample_rate)
@@ -107,9 +106,7 @@ class MSERPredictor:
         return feature
 
     # 预测一个音频的特征
-    def predict(self,
-                audio_data,
-                sample_rate=16000):
+    def predict(self, audio_data, sample_rate=16000):
         """预测一个音频
 
         :param audio_data: 需要识别的数据，支持文件路径，文件对象，字节，numpy。如果是字节的话，必须是完整并带格式的字节文件

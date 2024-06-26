@@ -63,5 +63,5 @@ def create_standard(config_file):
 
 if __name__ == '__main__':
     # get_data_list('dataset/audios', 'dataset')
-    create_ravdess_list('dataset/Audio_Speech_Actors_01-24', 'dataset')
-    create_standard('configs/bi_lstm.yml')
+    create_ravdess_list('pytorch/dataset/Audio_Speech_Actors_01-24', 'pytorch/dataset')
+    create_standard('pytorch/configs/bi_lstm.yml')
