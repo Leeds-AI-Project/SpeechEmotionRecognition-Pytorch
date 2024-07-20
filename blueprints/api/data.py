@@ -1,33 +1,20 @@
+import argparse
+import functools
 import os
 from pathlib import Path
 
-from flask import request, app
-from pydub import AudioSegment
-from config import config
-from blueprints.api import api_bp
-from pytorch import infer
-import argparse
-import functools
+from flask import request
 from mser.utils.utils import add_arguments, print_arguments
 
-
-# TODO: 待修改文件
-#  from pytorch import infer
-#  调用 infer.run() 使用模型进行分析，
-#  参数需要修改
-
-@api_bp.route('/get')
-def get_data():
-    return 'haha'
+from blueprints.api import api_bp
+from pytorch import infer
 
 
 @api_bp.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        print('11')
         return 'No file part'
 
-    print('22')
     file = request.files['file']
     if file.filename == '':
         return 'No selected file'
@@ -39,9 +26,7 @@ def upload_file():
         file_path = os.path.join(project_dir, filename)
         print('filename', file_path)
 
-        # 保存文件
         file.save(file_path)
-
 
         parser = argparse.ArgumentParser(description=__doc__)
         add_arg = functools.partial(add_arguments, argparser=parser)
@@ -51,4 +36,5 @@ def upload_file():
         add_arg('model_path', str, 'pytorch/models/BaseModel_Emotion2Vec/best_model/', '导出的预测模型文件路径')
         args = parser.parse_args()
         print_arguments(args=args)
+
         return infer.run(args), 200

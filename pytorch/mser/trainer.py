@@ -10,15 +10,6 @@ import numpy as np
 import torch
 import torch.distributed as dist
 import yaml
-from sklearn.metrics import confusion_matrix
-from sklearn.preprocessing import StandardScaler
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
-from torchinfo import summary
-from tqdm import tqdm
-from visualdl import LogWriter
-
 from mser import SUPPORT_MODEL, __version__
 from mser.data_utils.collate_fn import collate_fn
 from mser.data_utils.featurizer import AudioFeaturizer
@@ -29,6 +20,14 @@ from mser.models.bi_lstm import BiLSTM
 from mser.utils.logger import setup_logger
 from mser.utils.scheduler import WarmupCosineSchedulerLR
 from mser.utils.utils import dict_to_object, plot_confusion_matrix, print_arguments
+from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import StandardScaler
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.utils.data import DataLoader
+from torch.utils.data.distributed import DistributedSampler
+from torchinfo import summary
+from tqdm import tqdm
+from visualdl import LogWriter
 
 from pytorch.mser.models.lstm_self import LSTM
 
@@ -89,17 +88,14 @@ class MSERTrainer(object):
                                                aug_conf=self.configs.dataset_conf.aug_conf,
                                                sample_rate=self.configs.dataset_conf.sample_rate,
                                                use_dB_normalization=self.configs.dataset_conf.use_dB_normalization,
-                                               target_dB=self.configs.dataset_conf.target_dB,
-                                               mode='train')
+                                               target_dB=self.configs.dataset_conf.target_dB, mode='train')
             # 设置支持多卡训练
             train_sampler = None
             if torch.cuda.device_count() > 1:
                 # 设置支持多卡训练
                 train_sampler = DistributedSampler(dataset=self.train_dataset)
-            self.train_loader = DataLoader(dataset=self.train_dataset,
-                                           collate_fn=collate_fn,
-                                           shuffle=(train_sampler is None),
-                                           sampler=train_sampler,
+            self.train_loader = DataLoader(dataset=self.train_dataset, collate_fn=collate_fn,
+                                           shuffle=(train_sampler is None), sampler=train_sampler,
                                            **self.configs.dataset_conf.dataLoader)
         # 获取测试数据
         self.test_dataset = CustomDataset(data_list_path=self.configs.dataset_conf.test_list,
@@ -110,10 +106,8 @@ class MSERTrainer(object):
                                           min_duration=self.configs.dataset_conf.min_duration,
                                           sample_rate=self.configs.dataset_conf.sample_rate,
                                           use_dB_normalization=self.configs.dataset_conf.use_dB_normalization,
-                                          target_dB=self.configs.dataset_conf.target_dB,
-                                          mode='eval')
-        self.test_loader = DataLoader(dataset=self.test_dataset,
-                                      collate_fn=collate_fn,
+                                          target_dB=self.configs.dataset_conf.target_dB, mode='eval')
+        self.test_loader = DataLoader(dataset=self.test_dataset, collate_fn=collate_fn,
                                       batch_size=self.configs.dataset_conf.eval_conf.batch_size,
                                       num_workers=self.configs.dataset_conf.dataLoader.num_workers)
 
@@ -123,14 +117,12 @@ class MSERTrainer(object):
                                            method_args=self.configs.preprocess_conf.get('method_args', {}))
         # 获取测试数据
         test_dataset = CustomDataset(data_list_path=self.configs.dataset_conf.train_list,
-                                     audio_featurizer=audio_featurizer,
-                                     do_vad=self.configs.dataset_conf.do_vad,
+                                     audio_featurizer=audio_featurizer, do_vad=self.configs.dataset_conf.do_vad,
                                      max_duration=self.configs.dataset_conf.max_duration,
                                      min_duration=self.configs.dataset_conf.min_duration,
                                      sample_rate=self.configs.dataset_conf.sample_rate,
                                      use_dB_normalization=self.configs.dataset_conf.use_dB_normalization,
-                                     target_dB=self.configs.dataset_conf.target_dB,
-                                     mode='create_data')
+                                     target_dB=self.configs.dataset_conf.target_dB, mode='create_data')
         data = []
         for i in tqdm(range(len(test_dataset))):
             feature, _ = test_dataset[i]
@@ -145,13 +137,11 @@ class MSERTrainer(object):
                                            method_args=self.configs.preprocess_conf.get('method_args', {}))
         for i, data_list in enumerate([self.configs.dataset_conf.train_list, self.configs.dataset_conf.test_list]):
             # 获取测试数据
-            test_dataset = CustomDataset(data_list_path=data_list,
-                                         audio_featurizer=audio_featurizer,
+            test_dataset = CustomDataset(data_list_path=data_list, audio_featurizer=audio_featurizer,
                                          do_vad=self.configs.dataset_conf.do_vad,
                                          sample_rate=self.configs.dataset_conf.sample_rate,
                                          use_dB_normalization=self.configs.dataset_conf.use_dB_normalization,
-                                         target_dB=self.configs.dataset_conf.target_dB,
-                                         mode='extract_feature')
+                                         target_dB=self.configs.dataset_conf.target_dB, mode='extract_feature')
             save_data_list = data_list.replace('.txt', '_features.txt')
             with open(save_data_list, 'w', encoding='utf-8') as f:
                 for i in tqdm(range(len(test_dataset))):
@@ -184,8 +174,8 @@ class MSERTrainer(object):
             self.model = torch.compile(self.model, mode="reduce-overhead")
         # print(self.model)
         # 获取损失函数
-        weight = torch.tensor(self.configs.train_conf.loss_weight, dtype=torch.float, device=self.device) \
-            if self.configs.train_conf.loss_weight is not None else None
+        weight = torch.tensor(self.configs.train_conf.loss_weight, dtype=torch.float,
+                              device=self.device) if self.configs.train_conf.loss_weight is not None else None
         self.loss = torch.nn.CrossEntropyLoss(weight=weight)
         if is_train:
             if self.configs.train_conf.enable_amp:
@@ -208,18 +198,15 @@ class MSERTrainer(object):
             else:
                 raise Exception(f'不支持优化方法：{optimizer}')
             # 学习率衰减函数
-            scheduler_args = self.configs.optimizer_conf.get('scheduler_args', {}) \
-                if self.configs.optimizer_conf.get('scheduler_args', {}) is not None else {}
+            scheduler_args = self.configs.optimizer_conf.get('scheduler_args', {}) if self.configs.optimizer_conf.get(
+                'scheduler_args', {}) is not None else {}
             if self.configs.optimizer_conf.scheduler == 'CosineAnnealingLR':
                 max_step = int(self.configs.train_conf.max_epoch * 1.2) * len(self.train_loader)
-                self.scheduler = CosineAnnealingLR(optimizer=self.optimizer,
-                                                   T_max=max_step,
-                                                   **scheduler_args)
+                self.scheduler = CosineAnnealingLR(optimizer=self.optimizer, T_max=max_step, **scheduler_args)
             elif self.configs.optimizer_conf.scheduler == 'WarmupCosineSchedulerLR':
                 self.scheduler = WarmupCosineSchedulerLR(optimizer=self.optimizer,
                                                          fix_epoch=self.configs.train_conf.max_epoch,
-                                                         step_per_epoch=len(self.train_loader),
-                                                         **scheduler_args)
+                                                         step_per_epoch=len(self.train_loader), **scheduler_args)
             else:
                 raise Exception(f'不支持学习率衰减函数：{self.configs.optimizer_conf.scheduler}')
 
@@ -238,8 +225,8 @@ class MSERTrainer(object):
             for name, weight in model_dict.items():
                 if name in model_state_dict.keys():
                     if list(weight.shape) != list(model_state_dict[name].shape):
-                        logger.warning('{} not used, shape {} unmatched with {} in model.'.
-                                       format(name, list(model_state_dict[name].shape), list(weight.shape)))
+                        logger.warning('{} not used, shape {} unmatched with {} in model.'.format(name, list(
+                            model_state_dict[name].shape), list(weight.shape)))
                         model_state_dict.pop(name, None)
                 else:
                     logger.warning('Lack weight: {}'.format(name))
@@ -255,8 +242,8 @@ class MSERTrainer(object):
         last_model_dir = os.path.join(save_model_path,
                                       f'{self.configs.use_model}_{self.configs.preprocess_conf.feature_method}',
                                       'last_model')
-        if resume_model is not None or (os.path.exists(os.path.join(last_model_dir, 'model.pth'))
-                                        and os.path.exists(os.path.join(last_model_dir, 'optimizer.pth'))):
+        if resume_model is not None or (os.path.exists(os.path.join(last_model_dir, 'model.pth')) and os.path.exists(
+                os.path.join(last_model_dir, 'optimizer.pth'))):
             # 自动获取最新保存的模型
             if resume_model is None: resume_model = last_model_dir
             assert os.path.exists(os.path.join(resume_model, 'model.pth')), "模型参数文件不存在！"
@@ -379,10 +366,7 @@ class MSERTrainer(object):
             start = time.time()
             self.scheduler.step()
 
-    def train(self,
-              save_model_path='models/',
-              resume_model=None,
-              pretrained_model=None):
+    def train(self, save_model_path='models/', resume_model=None, pretrained_model=None):
         """
         训练模型
         :param save_model_path: 模型保存的路径
@@ -438,8 +422,12 @@ class MSERTrainer(object):
                 if self.stop_eval: continue
                 logger.info('=' * 70)
                 self.eval_loss, self.eval_acc = self.evaluate()
-                logger.info('Test epoch: {}, time/epoch: {}, loss: {:.5f}, accuracy: {:.5f}'.format(
-                    epoch_id, str(timedelta(seconds=(time.time() - start_epoch))), self.eval_loss, self.eval_acc))
+                logger.info('Test epoch: {}, time/epoch: {}, loss: {:.5f}, accuracy: {:.5f}'.format(epoch_id,
+                                                                                                    str(timedelta(
+                                                                                                        seconds=(
+                                                                                                                    time.time() - start_epoch))),
+                                                                                                    self.eval_loss,
+                                                                                                    self.eval_acc))
                 logger.info('=' * 70)
                 writer.add_scalar('Test/Accuracy', self.eval_acc, self.test_log_step)
                 writer.add_scalar('Test/Loss', self.eval_loss, self.test_log_step)
