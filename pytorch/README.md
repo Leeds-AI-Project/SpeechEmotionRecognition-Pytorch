@@ -2,14 +2,6 @@
 
 本项目是一个语音情感识别项目，使用多种的预处理方法，使用多种模型，实现了语音情感识别。
 
-**欢迎大家扫码入知识星球或者QQ群讨论，知识星球里面提供项目的模型文件和博主其他相关项目的模型文件，也包括其他一些资源。**
-
-<div align="center">
-  <img src="https://yeyupiaoling.cn/zsxq.png" alt="知识星球" width="400">
-  <img src="https://yeyupiaoling.cn/qq.png" alt="QQ群" width="400">
-</div>
-
-
 # 使用准备
 
  - Anaconda 3
@@ -19,20 +11,19 @@
 
 # 模型测试表
 
-|    模型     | Params(M) |     预处理方法     |   数据集   | 类别数量 |   准确率   |   获取模型   |
-|:---------:|:---------:|:-------------:|:-------:|:----:|:-------:|:--------:|
-|  BiLSTM   |   2.10    |  Emotion2Vec  | RAVDESS |  8   | 0.85333 | 加入知识星球获取 |
-|  BiLSTM   |   1.87    | CustomFeature | RAVDESS |  8   | 0.68666 | 加入知识星球获取 |
-| BaseModel |   0.19    |  Emotion2Vec  | RAVDESS |  8   | 0.85333 | 加入知识星球获取 |
-| BaseModel |   0.08    | CustomFeature | RAVDESS |  8   | 0.68000 | 加入知识星球获取 |
-|  BiLSTM   |   2.10    |  Emotion2Vec  |  更大数据集  |  9   | 0.91826 | 加入知识星球获取 |
-|  BiLSTM   |   1.87    | CustomFeature |  更大数据集  |  9   | 0.90817 | 加入知识星球获取 |
-| BaseModel |   0.19    |  Emotion2Vec  |  更大数据集  |  9   | 0.92870 | 加入知识星球获取 |
-| BaseModel |   0.08    | CustomFeature |  更大数据集  |  9   | 0.91026 | 加入知识星球获取 |
-
+|    模型     | Params(M) |     预处理方法     |   数据集   | 类别数量 |   准确率   |   
+|:---------:|:---------:|:-------------:|:-------:|:----:|:-------:|
+|  BiLSTM   |   2.10    |  Emotion2Vec  | RAVDESS |  8   | 0.85333
+|  BiLSTM   |   1.87    | CustomFeature | RAVDESS |  8   | 0.68666
+| BaseModel |   0.19    |  Emotion2Vec  | RAVDESS |  8   | 0.85333
+| BaseModel |   0.08    | CustomFeature | RAVDESS |  8   | 0.68000
+|  BiLSTM   |   2.10    |  Emotion2Vec  |  更大数据集  |  9   | 0.91826
+|  BiLSTM   |   1.87    | CustomFeature |  更大数据集  |  9   | 0.90817
+| BaseModel |   0.19    |  Emotion2Vec  |  更大数据集  |  9   | 0.92870
+| BaseModel |   0.08    | CustomFeature |  更大数据集  |  9   | 0.91026 
 说明：
 1. RAVDESS数据集只使用`Audio_Speech_Actors_01-24.zip`
-2. 更大数据集数据集有近2.5万条数据，做了数据量均衡的，知识星球也提供了该数据集的特征数据。
+2. 更大数据集数据集有近2.5万条数据，做了数据量均衡的
 
 ## 安装环境
 
@@ -258,12 +249,6 @@ shutil.rmtree(f'{user_dir}/.cache/matplotlib', ignore_errors=True)
 ```
 
 
-<br/>
-<div align="center">
-<img src="docs/images/image1.png" alt="打赏作者" width="600">
-</div>
-
-
 # 预测
 
 在训练结束之后，我们得到了一个模型参数文件，我们使用这个模型预测音频。
@@ -271,13 +256,6 @@ shutil.rmtree(f'{user_dir}/.cache/matplotlib', ignore_errors=True)
 ```shell
 python infer.py --audio_path=dataset/test.wav
 ```
-
-## 打赏作者
-<br/>
-<div align="center">
-<p>打赏一块钱支持一下作者</p>
-<img src="https://yeyupiaoling.cn/reward.png" alt="打赏作者" width="400">
-</div>
 
 # 参考资料
 
